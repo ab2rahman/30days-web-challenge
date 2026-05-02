@@ -1,6 +1,6 @@
 # 30 Days Web Challenge
 
-Community-built website. 30 days. 30 features. Strangers decide what gets built.
+Community-built website. 30 days. 30 features. Strangers decide what gets built. Open source.
 
 ## How It Works
 
@@ -18,12 +18,13 @@ Community-built website. 30 days. 30 features. Strangers decide what gets built.
 
 ## The Website
 
-**Live at:** [abduarrahman.com](https://abduarrahman.com)
+**Live at:** [abduarrahman.com/30days-web-challenge](https://abduarrahman.com/30days-web-challenge)
 
-## Follow
+## Links
 
-- YouTube: coming soon
-- Instagram: coming soon
+- Website: [abduarrahman.com](https://abduarrahman.com)
+- YouTube: [@abduarrahmanscode](https://www.youtube.com/@abduarrahmanscode)
+- GitHub: [ab2rahman](https://github.com/ab2rahman)
 
 ---
 
