@@ -16,6 +16,28 @@ Community-built website. 30 days. 30 features. Strangers decide what gets built.
 - Must be **possible** to build
 - I have **final say** if something breaks the rules
 
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **Animations:** Framer Motion + GSAP
+- **Deploy:** abduarrahman.com/30days-web-challenge
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+```bash
+npm run build   # Production build
+npm run start   # Start production server
+```
+
 ## The Website
 
 **Live at:** [abduarrahman.com/30days-web-challenge](https://abduarrahman.com/30days-web-challenge)
