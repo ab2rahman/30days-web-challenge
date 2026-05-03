@@ -15,13 +15,8 @@ export default function CommentCard({ comment, index }: CommentCardProps) {
     built: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
   };
 
-  return (
-    <motion.div
-      className="rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-    >
+  const content = (
+    <>
       <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-semibold text-white/80">
           @{comment.username}
@@ -45,7 +40,34 @@ export default function CommentCard({ comment, index }: CommentCardProps) {
             <span className="text-blue-400/70">{comment.feature}</span>
           </>
         )}
+        {comment.url && (
+          <>
+            <span className="text-white/10">·</span>
+            <span className="text-pink-400/60">View on Instagram</span>
+          </>
+        )}
       </div>
+    </>
+  );
+
+  const card = (
+    <motion.div
+      className="rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+    >
+      {content}
     </motion.div>
   );
+
+  if (comment.url) {
+    return (
+      <a href={comment.url} target="_blank" rel="noopener noreferrer">
+        {card}
+      </a>
+    );
+  }
+
+  return card;
 }

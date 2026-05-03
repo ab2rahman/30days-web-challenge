@@ -50,7 +50,7 @@ export default function SideMenu() {
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 px-6 py-5">
                 <div>
-                  <h2 className="text-lg font-bold text-white">Community</h2>
+                  <h2 className="text-lg font-bold text-white">Instagram</h2>
                   <p className="text-xs text-white/30">
                     {comments.length} idea{comments.length !== 1 ? "s" : ""}
                   </p>
