@@ -41,7 +41,7 @@ Open [http://localhost:3000](http://localhost:3000).
 bun run build   # Production static export
 ```
 
-## Day 1 — Magicarp Countdown Challenge
+## Day 1 — Magikarp Countdown Challenge
 
 The first community challenge: a countdown timer game with dice rolling mechanics.
 
