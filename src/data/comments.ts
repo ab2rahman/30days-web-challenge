@@ -20,4 +20,14 @@ export const comments: Comment[] = [
     feature: "Magikarp Countdown Challenge",
     url: "https://www.instagram.com/p/DX3v1ATRb_9/",
   },
+  {
+    id: 2,
+    day: 2,
+    username: "harriesantosoyusuf",
+    text: "https://www.a1k0n.net/2011/07/20/donut-math.html\n2006 donut c",
+    likes: 1,
+    status: "built",
+    feature: "ASCII Donut Math Animation",
+    url: "https://www.instagram.com/p/DX5w_9zA5GH/",
+  },
 ];

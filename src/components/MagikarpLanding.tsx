@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import DonutAnimation from "./DonutAnimation";
 
 interface Bubble {
   id: number;
@@ -248,13 +249,21 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <motion.h1
-          className="text-3xl md:text-5xl font-black text-white mb-3"
+        <motion.div
+          className="flex flex-col items-center justify-center mb-3"
           animate={{ opacity: [0.8, 1, 0.8] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
-          30 Days Web Challenge
-        </motion.h1>
+          <div className="flex items-center justify-center">
+            <span className="text-[10rem] md:text-[14rem] leading-none font-black text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+              3
+            </span>
+            <DonutAnimation className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" />
+          </div>
+          <span className="text-2xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent">
+            Days Web Challenge
+          </span>
+        </motion.div>
         <p className="text-sm md:text-base text-cyan-300/60">
           Community-built. 30 days. 30 features.
         </p>
@@ -360,7 +369,7 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
       >
-        DAY 1 — 30 DAYS WEB CHALLENGE
+        DAY 2 — 30 DAYS WEB CHALLENGE
       </motion.div>
     </div>
   );

@@ -99,7 +99,7 @@ export default function SideMenu() {
               {/* Footer */}
               <div className="border-t border-white/5 px-6 py-4">
                 <p className="text-center text-xs text-white/20">
-                  Day 1 · Waiting for ideas...
+                  Day 2 · Donut Math Edition
                 </p>
               </div>
             </motion.aside>
