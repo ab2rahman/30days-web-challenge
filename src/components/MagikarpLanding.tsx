@@ -474,8 +474,9 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
               3
             </span>
             {isExploding ? (
-              <div className="inline-block align-middle scale-100 md:scale-[2] origin-center select-none"
-                style={{ opacity: 0 }}
+              <DonutAnimation
+                glitching={true}
+                onClick={() => {}}
               />
             ) : (
               <DonutAnimation
