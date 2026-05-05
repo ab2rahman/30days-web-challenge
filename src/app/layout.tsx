@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "30 Days Web Challenge",
+  title: "30 Days Web Challenge — Day 2: ASCII Donut Math",
   description:
-    "Community-built website. 30 days. 30 features. Strangers decide what gets built.",
+    "Community-built website. 30 days. 30 features. Strangers decide what gets built. Day 2: A spinning ASCII donut replaces the title, with glitch effects and explosions.",
   openGraph: {
-    title: "30 Days Web Challenge",
+    title: "30 Days Web Challenge — Day 2: ASCII Donut Math",
     description:
-      "Community-built website. 30 days. 30 features. Strangers decide what gets built.",
+      "Community-built website. 30 days. 30 features. Strangers decide what gets built. Day 2: A spinning ASCII donut replaces the title, with glitch effects and explosions.",
     url: "https://abduarrahman.com/30days-web-challenge",
     siteName: "30 Days Web Challenge",
     type: "website",
@@ -37,7 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="h-full bg-white text-slate-900">
+      <body className="h-full" style={{ background: "#050B18", color: "#F5F7FA" }}>
         <SideMenu />
         {children}
       </body>

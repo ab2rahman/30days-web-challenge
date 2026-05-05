@@ -13,7 +13,13 @@ export default function SideMenu() {
       {/* Hamburger button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-5 left-5 z-40 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 shadow-lg shadow-black/20 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white/90 hover:border-white/20 hover:shadow-xl"
+        className="fixed top-5 left-5 z-40 flex h-10 w-10 items-center justify-center rounded-xl border transition-all backdrop-blur-md"
+        style={{
+          borderColor: "rgba(0,175,255,0.15)",
+          background: "rgba(0,175,255,0.05)",
+          color: "rgba(0,175,255,0.6)",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+        }}
         aria-label="Open menu"
       >
         <svg
@@ -32,7 +38,8 @@ export default function SideMenu() {
           <>
             {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md"
+              className="fixed inset-0 z-40 backdrop-blur-md"
+              style={{ background: "rgba(5,11,24,0.7)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -41,17 +48,18 @@ export default function SideMenu() {
 
             {/* Panel */}
             <motion.aside
-              className="fixed top-0 left-0 z-50 flex h-full w-full max-w-sm flex-col border-r border-white/10 bg-slate-950/90 backdrop-blur-xl"
+              className="fixed top-0 left-0 z-50 flex h-full w-full max-w-sm flex-col border-r backdrop-blur-xl"
+              style={{ background: "rgba(5,11,24,0.95)", borderColor: "rgba(0,175,255,0.1)" }}
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 250 }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-white/5 px-6 py-5">
+              <div className="flex items-center justify-between border-b px-6 py-5" style={{ borderColor: "rgba(0,175,255,0.08)" }}>
                 <div>
                   <h2 className="text-lg font-bold text-white">Instagram</h2>
-                  <p className="text-xs text-white/30">
+                  <p className="text-xs" style={{ color: "#9AA4B2" }}>
                     {comments.length} idea{comments.length !== 1 ? "s" : ""}
                   </p>
                 </div>
@@ -76,10 +84,10 @@ export default function SideMenu() {
               <div className="flex-1 overflow-y-auto px-4 py-4">
                 {comments.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center text-center">
-                    <p className="mb-2 text-sm text-white/20">
+                    <p className="mb-2 text-sm" style={{ color: "rgba(0,175,255,0.3)" }}>
                       No ideas yet
                     </p>
-                    <p className="text-xs text-white/10">
+                    <p className="text-xs" style={{ color: "rgba(0,175,255,0.15)" }}>
                       Comment your idea on the reel!
                     </p>
                   </div>
@@ -97,8 +105,8 @@ export default function SideMenu() {
               </div>
 
               {/* Footer */}
-              <div className="border-t border-white/5 px-6 py-4">
-                <p className="text-center text-xs text-white/20">
+              <div className="border-t px-6 py-4" style={{ borderColor: "rgba(0,175,255,0.08)" }}>
+                <p className="text-center text-xs" style={{ color: "#9AA4B2" }}>
                   Day 2 · Donut Math Edition
                 </p>
               </div>
