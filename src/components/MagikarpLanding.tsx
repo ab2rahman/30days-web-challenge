@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DonutAnimation from "./DonutAnimation";
+import ElGranmaja from "./ElGranmaja";
 
 interface Bubble {
   id: number;
@@ -602,6 +603,9 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
           />
         ))}
       </AnimatePresence>
+
+      {/* El Granmaja walking around */}
+      <ElGranmaja />
 
       {/* Day label */}
       <motion.div
