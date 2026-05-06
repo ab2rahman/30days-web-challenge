@@ -545,7 +545,7 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
         } : {}}
       >
         <motion.img
-          src="/day1/magikarp.png"
+          src="/day1/magikarp.webp"
           alt="Magikarp"
           className="w-24 h-24 md:w-32 md:h-32 object-contain pointer-events-none"
           style={{
