@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DonutAnimation from "./DonutAnimation";
-import ElGranmaja from "./ElGranmaja";
+import GanBloop from "./GanBloop";
 
 interface Bubble {
   id: number;
@@ -201,11 +201,6 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
   const posRef = useRef({ x: 50, y: 50 });
   const velRef = useRef({ vx: 0.25, vy: 0.2 });
 
-  // Ambient sound
-  useEffect(() => {
-    const drone = startAmbientDrone();
-    return () => drone.stop();
-  }, []);
 
   const bubbles = useMemo<Bubble[]>(() => {
     const seed = (i: number, offset: number) => {
@@ -605,7 +600,7 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
       </AnimatePresence>
 
       {/* El Granmaja walking around */}
-      <ElGranmaja />
+      <GanBloop />
 
       {/* Day label */}
       <motion.div
