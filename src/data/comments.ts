@@ -30,4 +30,14 @@ export const comments: Comment[] = [
     feature: "ASCII Donut Math Animation",
     url: "https://www.instagram.com/p/DX5w_9zA5GH/",
   },
+  {
+    id: 3,
+    day: 3,
+    username: "mahfiraamalia",
+    text: "Pak abdu kata anak saya tambahin bloop sama elgranmaja lagi berantem 🗿",
+    likes: 1,
+    status: "built",
+    feature: "Granloop Arena TV",
+    url: "https://www.instagram.com/p/DX9YAmXztsE/",
+  },
 ];

@@ -610,7 +610,7 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
       >
-        DAY 2 — 30 DAYS WEB CHALLENGE
+        DAY 3 — 30 DAYS WEB CHALLENGE
       </motion.div>
 
       {/* Donut click popup */}
