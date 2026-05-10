@@ -96,7 +96,7 @@ export default function DonutAnimation({
   return (
     <div
       onClick={onClick}
-      className={`inline-block align-middle scale-100 md:scale-[2] origin-center select-none cursor-pointer ${className}`}
+      className={`inline-block align-middle scale-[1.5] md:scale-[2] origin-center select-none cursor-pointer ${className}`}
       style={{
         filter: glitching
           ? "drop-shadow(0 0 30px rgba(255,0,100,0.6)) drop-shadow(0 0 60px rgba(255,100,0,0.3))"
