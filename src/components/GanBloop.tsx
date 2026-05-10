@@ -333,7 +333,7 @@ export default function GanBloop() {
   const teamLabel = (t: number) => t === 0 ? "GRANMAJA" : "BLOOP";
 
   return (
-    <div ref={rootRef} className="fixed z-50 select-none" style={{
+    <div ref={rootRef} className="fixed z-30 select-none" style={{
       ...posStyle, width: collapsed ? 200 : TV_W + 24,
       fontFamily: "var(--font-geist-mono), monospace", transition: "width 0.3s ease",
     }}>
