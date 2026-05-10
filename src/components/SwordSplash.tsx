@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ZoroPixelLoader from "./ZoroPixelLoader";
 
@@ -9,30 +9,60 @@ const LOADING_MUSIC = "/zoroloading.mp3";
 const SANTORYU_MUSIC = "/zorosantoryu.mp3";
 const SLASH_SOUND = "/slashsound.mp3";
 
-const SLASH_SOUND_DUR = 576; // ms — one slash sound duration
+const SLASH_SOUND_DUR = 576;
 const NUM_SLASHES = 3;
-const SLASH_INTERVAL = SLASH_SOUND_DUR; // play next slash right after previous ends
-const TOTAL_SLASH_TIME = NUM_SLASHES * SLASH_INTERVAL; // ~1728ms for 3 slashes
-const SANTORYU_DUR = 2736; // ms — zorosantoryu.mp3 duration
+const SLASH_INTERVAL = SLASH_SOUND_DUR;
+const TOTAL_SLASH_TIME = NUM_SLASHES * SLASH_INTERVAL;
+const SANTORYU_DUR = 2736;
 
-// ── 3 Slash lines — one per slash, different angles ──────────
+// ── 3 Slash lines ──────────
 const SLASHES = [
-  { angle: -30, delay: 0, id: 1 },
-  { angle: 15, delay: SLASH_INTERVAL, id: 2 },
-  { angle: -50, delay: SLASH_INTERVAL * 2, id: 3 },
+  { angle: -30, delay: 0 },
+  { angle: 15, delay: SLASH_INTERVAL },
+  { angle: -50, delay: SLASH_INTERVAL * 2 },
 ];
 
-// ── Fragments for 3 slash cuts ──────────
+// ── Pre-compute random values (no re-renders) ──────────
+// biome-ignore lint: pre-computed random values for stable rendering
+const SPARKS = SLASHES.flatMap((s, si) =>
+  Array.from({ length: 4 }, (_, pi) => {
+    const t = pi / 4;
+    const rad = (s.angle * Math.PI) / 180;
+    return {
+      key: `s-${si}-${pi}`,
+      left: `${50 + (t - 0.5) * 80 * Math.cos(rad)}%`,
+      top: `${50 + (t - 0.5) * 80 * Math.sin(rad)}%`,
+      w: 3 + Math.floor(Math.random() * 4),
+      h: 3 + Math.floor(Math.random() * 4),
+      bg: pi % 2 === 0 ? "#333" : "#888",
+      dx: (Math.random() - 0.5) * 80,
+      dy: (Math.random() - 0.5) * 80,
+      delay: s.delay / 1000 + t * 0.15,
+    };
+  })
+);
+
+// biome-ignore lint: pre-computed debris positions
+const DEBRIS = Array.from({ length: 15 }, (_, i) => ({
+  key: `d-${i}`,
+  left: `${10 + Math.floor(Math.random() * 80)}%`,
+  top: `${10 + Math.floor(Math.random() * 80)}%`,
+  w: 2 + Math.floor(Math.random() * 4),
+  h: 2 + Math.floor(Math.random() * 4),
+  dx: (Math.random() - 0.5) * 160,
+  dy: (Math.random() - 0.5) * 160,
+  dur: 0.4 + Math.random() * 0.3,
+  del: Math.random() * 0.12,
+}));
+
+// ── Fragments ──────────
 const FRAGMENTS = [
-  // Top section
   { clipPath: "polygon(0 0, 33% 0, 33% 33%, 0 33%)", origin: "0% 0%", x: "-20%", y: "-30%", rot: -6, delay: 0 },
   { clipPath: "polygon(33% 0, 66% 0, 66% 33%, 33% 33%)", origin: "50% 16%", x: "0%", y: "-35%", rot: 3, delay: 0.05 },
   { clipPath: "polygon(66% 0, 100% 0, 100% 33%, 66% 33%)", origin: "100% 0%", x: "25%", y: "-25%", rot: 8, delay: 0.02 },
-  // Middle section
   { clipPath: "polygon(0 33%, 33% 33%, 33% 66%, 0 66%)", origin: "0% 50%", x: "-30%", y: "5%", rot: -4, delay: 0.08 },
   { clipPath: "polygon(33% 33%, 66% 33%, 66% 66%, 33% 66%)", origin: "50% 50%", x: "10%", y: "10%", rot: 2, delay: 0.03 },
   { clipPath: "polygon(66% 33%, 100% 33%, 100% 66%, 66% 66%)", origin: "100% 50%", x: "35%", y: "-5%", rot: -7, delay: 0.06 },
-  // Bottom section
   { clipPath: "polygon(0 66%, 33% 66%, 33% 100%, 0 100%)", origin: "0% 100%", x: "-25%", y: "30%", rot: -10, delay: 0.1 },
   { clipPath: "polygon(33% 66%, 66% 66%, 66% 100%, 33% 100%)", origin: "50% 83%", x: "15%", y: "35%", rot: 5, delay: 0.04 },
   { clipPath: "polygon(66% 66%, 100% 66%, 100% 100%, 66% 100%)", origin: "100% 100%", x: "30%", y: "25%", rot: -8, delay: 0.07 },
@@ -43,13 +73,11 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
   const [phase, setPhase] = useState<"tap" | "loading" | "santoryu" | "slash" | "shatter" | "done">("tap");
   const [progress, setProgress] = useState(0);
   const [shake, setShake] = useState(false);
-  const [showCuts, setShowCuts] = useState(false);
-  const [fadeOutCuts, setFadeOutCuts] = useState(false);
   const loadingAudioRef = useRef<HTMLAudioElement | null>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   const startLoading = useCallback(() => {
     setPhase("loading");
-
     const audio = new Audio(LOADING_MUSIC);
     audio.loop = true;
     audio.volume = 0.6;
@@ -58,7 +86,6 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
   }, []);
 
   const triggerSantoryu = useCallback(() => {
-    // Fade out loading music
     const loadAudio = loadingAudioRef.current;
     if (loadAudio) {
       const fade = setInterval(() => {
@@ -74,7 +101,6 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
 
     setPhase("santoryu");
 
-    // Play Santoryu music + show image
     const santoryu = new Audio(SANTORYU_MUSIC);
     santoryu.volume = 0.8;
     santoryu.play().catch(() => {});
@@ -82,9 +108,7 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
     const startSlash = () => {
       setPhase("slash");
       setShake(true);
-      setShowCuts(true);
 
-      // Play 3 slash sounds spaced by SLASH_SOUND_DUR
       for (let i = 0; i < NUM_SLASHES; i++) {
         setTimeout(() => {
           const s = new Audio(SLASH_SOUND);
@@ -97,14 +121,12 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
         setShake(false);
         setPhase("shatter");
         setTimeout(() => {
-          setFadeOutCuts(true);
           setPhase("done");
           setTimeout(onComplete, 400);
         }, 800);
       }, TOTAL_SLASH_TIME + 200);
     };
 
-    // Use onended if audio plays, otherwise fallback to timer
     let slashStarted = false;
     const tryStart = () => {
       if (slashStarted) return;
@@ -112,10 +134,10 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
       startSlash();
     };
     santoryu.onended = tryStart;
-    // Fallback: if audio blocked, use hardcoded duration
     setTimeout(tryStart, SANTORYU_DUR + 300);
   }, [onComplete]);
 
+  // Progress bar via ref (no re-renders)
   useEffect(() => {
     if (phase !== "loading") return;
     const startTime = Date.now();
@@ -123,9 +145,9 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const p = Math.min(elapsed / duration, 1);
-      setProgress(p);
+      if (progressRef.current) progressRef.current.style.width = `${p * 100}%`;
       if (p >= 1) { clearInterval(interval); triggerSantoryu(); }
-    }, 30);
+    }, 50); // 50ms instead of 30ms
     return () => clearInterval(interval);
   }, [phase, triggerSantoryu]);
 
@@ -139,6 +161,7 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
         style={{
           background: "#FFFFFF",
           animation: shake ? "splash-shake 0.06s infinite" : "none",
+          willChange: "transform",
         }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.1 }}
@@ -151,14 +174,9 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
             75% { transform: translate(-2px, 1px); }
             100% { transform: translate(3px, -2px); }
           }
-          @keyframes zoro-slash-glow {
-            0% { filter: drop-shadow(0 0 0px transparent); }
-            50% { filter: drop-shadow(0 0 30px rgba(0,150,255,0.7)) drop-shadow(0 0 60px rgba(0,150,255,0.3)); }
-            100% { filter: drop-shadow(0 0 80px rgba(0,150,255,0.9)) drop-shadow(0 0 120px rgba(0,100,255,0.5)); }
-          }
         `}</style>
 
-        {/* ── Tap to Start Phase ── */}
+        {/* ── Tap to Start ── */}
         {phase === "tap" && (
           <motion.div
             className="flex flex-col items-center gap-8 cursor-pointer"
@@ -172,17 +190,13 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
               <span className="text-2xl font-black tracking-tight text-gray-900">30 DAYS</span>
               <span className="text-xs font-medium tracking-[0.3em] text-gray-400">WEB CHALLENGE</span>
             </div>
-            <motion.div
-              className="flex flex-col items-center gap-2"
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
+            <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>
               <span className="text-sm font-semibold text-gray-500 tracking-wider">TAP TO START</span>
             </motion.div>
           </motion.div>
         )}
 
-        {/* ── Loading Phase ── */}
+        {/* ── Loading ── */}
         {phase === "loading" && (
           <div className="flex flex-col items-center gap-6">
             <ZoroPixelLoader sprite="run" fps={14} scale={0.3} />
@@ -191,12 +205,12 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
               <span className="text-xs font-medium tracking-[0.3em] text-gray-400 mt-1">WEB CHALLENGE</span>
             </motion.div>
             <div className="w-48 h-[2px] bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-gray-900 rounded-full transition-all duration-75" style={{ width: `${progress * 100}%` }} />
+              <div ref={progressRef} className="h-full bg-gray-900 rounded-full" style={{ width: "0%", transition: "width 50ms linear" }} />
             </div>
           </div>
         )}
 
-        {/* ── Santoryu Phase — show image while music plays ── */}
+        {/* ── Santoryu ── */}
         {phase === "santoryu" && (
           <motion.div
             className="flex flex-col items-center justify-center"
@@ -207,7 +221,7 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
             <motion.img
               src="/zorosantoryu.png"
               alt="Santoryu"
-              style={{ imageRendering: "auto", maxHeight: "70vh" }}
+              style={{ maxHeight: "70vh" }}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: [0.8, 1.05, 1], opacity: [0, 1, 1] }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -215,13 +229,12 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
           </motion.div>
         )}
 
-        {/* ── Slash Phase — 3 slashes ── */}
+        {/* ── Slash Phase ── */}
         {phase === "slash" && (
           <div className="fixed inset-0">
-            {/* White base */}
             <div className="absolute inset-0 z-10 bg-white" />
 
-            {/* Zoro — big, animated, slashing */}
+            {/* Zoro slashing */}
             <motion.div
               className="absolute z-30 pointer-events-none"
               style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
@@ -235,92 +248,61 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
               }}
               transition={{ duration: TOTAL_SLASH_TIME / 1000, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div style={{
-                animation: "zoro-slash-glow 0.3s ease-out forwards",
-              }}>
-                <ZoroPixelLoader sprite="slash" fps={20} scale={1.2} />
-              </div>
+              <ZoroPixelLoader sprite="slash" fps={20} scale={1.2} />
             </motion.div>
 
-            {/* Slash blade tips — dark streaks that sweep across */}
+            {/* Blade tips */}
             {SLASHES.map((s, i) => (
-              <div key={`tip-${i}`} className="absolute inset-0 z-20 pointer-events-none">
-                <motion.div
-                  style={{
-                    position: "absolute",
-                    left: 0, top: 0,
-                    width: "30%", height: "8px",
-                    background: "linear-gradient(90deg, transparent, #444 20%, #000 50%, #444 80%, transparent)",
-                    boxShadow: "0 0 20px 4px rgba(0,0,0,0.8), 0 0 40px 8px rgba(100,180,255,0.4)",
-                    transformOrigin: "50% 50%",
-                    transform: `rotate(${s.angle}deg)`,
-                  }}
-                  initial={{ x: "-150%", y: 0, opacity: 0 }}
-                  animate={{ x: "500%", y: 0, opacity: [0, 1, 1, 0] }}
-                  transition={{ duration: 0.35, delay: s.delay / 1000, ease: [0.16, 1, 0.3, 1] }}
-                />
-              </div>
+              <motion.div
+                key={`tip-${i}`}
+                className="absolute inset-0 z-20 pointer-events-none"
+                style={{
+                  width: "30%", height: "6px",
+                  background: "linear-gradient(90deg, transparent, #444 20%, #000 50%, #444 80%, transparent)",
+                  boxShadow: "0 0 12px 2px rgba(0,0,0,0.6)",
+                  transformOrigin: "50% 50%",
+                  transform: `rotate(${s.angle}deg)`,
+                }}
+                initial={{ x: "-150%", opacity: 0 }}
+                animate={{ x: "500%", opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 0.35, delay: s.delay / 1000, ease: [0.16, 1, 0.3, 1] }}
+              />
             ))}
 
-            {/* PERSISTENT SCAR LINES — appear with each slash, stay forever */}
+            {/* Scar lines — no blur glow on mobile, just solid lines */}
             {SLASHES.map((s, i) => (
-              <div key={`scar-${i}`} className="absolute inset-0 z-[60] pointer-events-none">
-                {/* Dark core line */}
-                <motion.div
-                  style={{
-                    position: "absolute",
-                    left: "-10%", top: "-10%",
-                    width: "120%", height: "6px",
-                    background: "#000",
-                    boxShadow: "0 0 4px 2px rgba(0,0,0,1), 0 0 12px 4px rgba(0,0,0,0.5)",
-                    transformOrigin: "50% 50%",
-                    transform: `rotate(${s.angle}deg)`,
-                  }}
-                  initial={{ scaleX: 0, opacity: 0 }}
-                  animate={{ scaleX: 1, opacity: 1 }}
-                  transition={{ duration: 0.25, delay: s.delay / 1000, ease: [0.16, 1, 0.3, 1] }}
-                />
-                {/* Blue glow around scar */}
-                <motion.div
-                  style={{
-                    position: "absolute",
-                    left: "-10%", top: "-10%",
-                    width: "120%", height: "28px",
-                    background: "linear-gradient(90deg, transparent 0%, rgba(60,140,255,0.2) 10%, rgba(60,140,255,0.5) 50%, rgba(60,140,255,0.2) 90%, transparent 100%)",
-                    transformOrigin: "50% 50%",
-                    transform: `rotate(${s.angle}deg)`,
-                    filter: "blur(6px)",
-                  }}
-                  initial={{ scaleX: 0, opacity: 0 }}
-                  animate={{ scaleX: 1, opacity: [0, 1, 0.7] }}
-                  transition={{ duration: 0.4, delay: s.delay / 1000, ease: [0.16, 1, 0.3, 1] }}
-                />
-              </div>
+              <motion.div
+                key={`scar-${i}`}
+                className="absolute inset-0 z-[60] pointer-events-none"
+                style={{
+                  left: "-10%", top: "-10%",
+                  width: "120%", height: "6px",
+                  background: "#000",
+                  boxShadow: "0 0 6px 2px rgba(0,0,0,0.8)",
+                  transformOrigin: "50% 50%",
+                  transform: `rotate(${s.angle}deg)`,
+                }}
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 1 }}
+                transition={{ duration: 0.25, delay: s.delay / 1000, ease: [0.16, 1, 0.3, 1] }}
+              />
             ))}
 
-            {/* Sparks per slash */}
-            {SLASHES.map((s, si) =>
-              Array.from({ length: 8 }).map((_, pi) => {
-                const t = pi / 8;
-                const rad = (s.angle * Math.PI) / 180;
-                const cx = 50 + (t - 0.5) * 80 * Math.cos(rad);
-                const cy = 50 + (t - 0.5) * 80 * Math.sin(rad);
-                return (
-                  <motion.div
-                    key={`s-${si}-${pi}`}
-                    className="absolute z-[70] rounded-full pointer-events-none"
-                    style={{
-                      left: `${cx}%`, top: `${cy}%`,
-                      width: 3 + Math.random() * 5, height: 3 + Math.random() * 5,
-                      background: pi % 2 === 0 ? "#333" : "#888",
-                    }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: [0, 1.5, 0], opacity: [0, 1, 0], x: (Math.random() - 0.5) * 100, y: (Math.random() - 0.5) * 100 }}
-                    transition={{ duration: 0.4, delay: (s.delay / 1000) + t * 0.15, ease: "easeOut" }}
-                  />
-                );
-              })
-            )}
+            {/* Sparks — pre-computed, fewer particles */}
+            {SPARKS.map((sp) => (
+              <motion.div
+                key={sp.key}
+                className="absolute z-[70] rounded-full pointer-events-none"
+                style={{
+                  left: sp.left, top: sp.top,
+                  width: sp.w, height: sp.h,
+                  background: sp.bg,
+                }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [0, 1.5, 0], opacity: [0, 1, 0], x: sp.dx, y: sp.dy }}
+                transition={{ duration: 0.4, delay: sp.delay, ease: "easeOut" }}
+              />
+            ))}
 
             {/* Flash per slash */}
             {SLASHES.map((s, i) => (
@@ -340,29 +322,23 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
           <div className="fixed inset-0">
             <div className="absolute inset-0 z-0" style={{ background: "#050B18" }} />
 
-            {/* Scar lines persist through shatter */}
+            {/* Scar lines persist */}
             {SLASHES.map((s, i) => (
-              <div key={`scar-${i}`} className="absolute inset-0 z-[60] pointer-events-none">
-                <div style={{
-                  position: "absolute",
+              <div
+                key={`scar-${i}`}
+                className="absolute inset-0 z-[60] pointer-events-none"
+                style={{
                   left: "-10%", top: "-10%",
                   width: "120%", height: "6px",
                   background: "#000",
-                  boxShadow: "0 0 4px 2px rgba(0,0,0,1), 0 0 12px 4px rgba(0,0,0,0.5)",
+                  boxShadow: "0 0 6px 2px rgba(0,0,0,0.8)",
                   transformOrigin: "50% 50%",
                   transform: `rotate(${s.angle}deg)`,
-                }} />
-                <div style={{
-                  position: "absolute",
-                  left: "-10%", top: "-10%",
-                  width: "120%", height: "28px",
-                  background: "linear-gradient(90deg, transparent 0%, rgba(60,140,255,0.2) 10%, rgba(60,140,255,0.5) 50%, rgba(60,140,255,0.2) 90%, transparent 100%)",
-                  transformOrigin: "50% 50%",
-                  transform: `rotate(${s.angle}deg)`,
-                  filter: "blur(6px)",
-                }} />
-              </div>
+                }}
+              />
             ))}
+
+            {/* Fragments */}
             <div className="absolute inset-0 z-10">
               {FRAGMENTS.map((f, i) => (
                 <motion.div
@@ -375,23 +351,25 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
                 />
               ))}
             </div>
-            {/* Debris */}
-            {Array.from({ length: 30 }).map((_, i) => (
+
+            {/* Debris — pre-computed, 15 instead of 30 */}
+            {DEBRIS.map((d) => (
               <motion.div
-                key={`d-${i}`}
+                key={d.key}
                 className="absolute z-20 rounded-full pointer-events-none"
                 style={{
-                  left: `${10 + Math.random() * 80}%`, top: `${10 + Math.random() * 80}%`,
-                  width: 2 + Math.random() * 5, height: 2 + Math.random() * 5,
+                  left: d.left, top: d.top,
+                  width: d.w, height: d.h,
                   background: "#ddd",
                 }}
                 initial={{ scale: 0, opacity: 1 }}
-                animate={{ scale: [0, 1, 0], opacity: [1, 0.7, 0], x: (Math.random() - 0.5) * 200, y: (Math.random() - 0.5) * 200 }}
-                transition={{ duration: 0.5 + Math.random() * 0.4, delay: Math.random() * 0.15, ease: "easeOut" }}
+                animate={{ scale: [0, 1, 0], opacity: [1, 0.7, 0], x: d.dx, y: d.dy }}
+                transition={{ duration: d.dur, delay: d.del, ease: "easeOut" }}
               />
             ))}
+
             {/* Final flash */}
-            <motion.div className="absolute inset-0 z-15 pointer-events-none"
+            <motion.div className="absolute inset-0 z-[70] pointer-events-none"
               style={{ background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 60%)" }}
               initial={{ opacity: 0.8, scale: 0.5 }} animate={{ opacity: 0, scale: 1.5 }}
               transition={{ duration: 0.3, ease: "easeOut" }}

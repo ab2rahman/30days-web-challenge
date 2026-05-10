@@ -26,8 +26,8 @@ export default function ZoroPixelLoader({ sprite = "run", fps = 14, scale = 0.5 
   const frameRef = useRef(0);
   const rafRef = useRef<number>(0);
   const lastTimeRef = useRef(0);
-  const imgRef = useRef<HTMLImageElement | null>(null);
   const config = SPRITES[sprite];
+  const fpsInterval = 1000 / fps;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,43 +37,41 @@ export default function ZoroPixelLoader({ sprite = "run", fps = 14, scale = 0.5 
 
     const img = new Image();
     img.src = config.src;
-    imgRef.current = img;
+
+    const animate = (time: number) => {
+      const delta = time - lastTimeRef.current;
+      if (delta >= fpsInterval) {
+        lastTimeRef.current = time - (delta % fpsInterval);
+
+        const frame = frameRef.current;
+        const col = frame % COLS;
+        const row = Math.floor(frame / COLS);
+
+        ctx!.clearRect(0, 0, config.frameW, config.frameH);
+        ctx!.drawImage(
+          img,
+          col * config.frameW,
+          row * config.frameH,
+          config.frameW,
+          config.frameH,
+          0,
+          0,
+          config.frameW,
+          config.frameH
+        );
+
+        frameRef.current = (frame + 1) % TOTAL_FRAMES;
+      }
+      rafRef.current = requestAnimationFrame(animate);
+    };
 
     img.onload = () => {
       ctx!.imageSmoothingEnabled = false;
-
-      const animate = (time: number) => {
-        const delta = time - lastTimeRef.current;
-        if (delta >= 1000 / fps) {
-          lastTimeRef.current = time;
-
-          const frame = frameRef.current;
-          const col = frame % COLS;
-          const row = Math.floor(frame / COLS);
-
-          ctx!.clearRect(0, 0, config.frameW, config.frameH);
-          ctx!.drawImage(
-            img,
-            col * config.frameW,
-            row * config.frameH,
-            config.frameW,
-            config.frameH,
-            0,
-            0,
-            config.frameW,
-            config.frameH
-          );
-
-          frameRef.current = (frameRef.current + 1) % TOTAL_FRAMES;
-        }
-        rafRef.current = requestAnimationFrame(animate);
-      };
-
       rafRef.current = requestAnimationFrame(animate);
     };
 
     return () => cancelAnimationFrame(rafRef.current);
-  }, [sprite, fps, config]);
+  }, [sprite, config, fpsInterval]);
 
   return (
     <canvas
