@@ -40,4 +40,14 @@ export const comments: Comment[] = [
     feature: "Granloop Arena TV",
     url: "https://www.instagram.com/p/DX9YAmXztsE/",
   },
+  {
+    id: 4,
+    day: 4,
+    username: "nuruldarari",
+    text: "Make zoro from one piece say something on the screen when u first visit the web",
+    likes: 0,
+    status: "built",
+    feature: "Zoro Santoryu Splash Screen",
+    url: "https://www.instagram.com/reel/DYCGW9Phni8/",
+  },
 ];

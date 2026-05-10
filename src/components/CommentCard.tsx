@@ -35,8 +35,6 @@ export default function CommentCard({ comment, index }: CommentCardProps) {
       </p>
       <div className="flex items-center gap-3 text-xs" style={{ color: "rgba(154,164,178,0.5)" }}>
         <span>Day {comment.day}</span>
-        <span style={{ color: "rgba(0,175,255,0.2)" }}>·</span>
-        <span>❤ {comment.likes}</span>
         {comment.feature && (
           <>
             <span style={{ color: "rgba(0,175,255,0.2)" }}>·</span>

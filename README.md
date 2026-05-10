@@ -24,8 +24,9 @@ Community-built website. 30 days. 30 features. Strangers decide what gets built.
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
 - **Animations:** Framer Motion, GSAP
-- **Audio:** Web Audio API (synthesized sounds)
+- **Audio:** Web Audio API (synthesized sounds), MP3 playback
 - **Video:** HTML5 Video with autoplay handling
+- **Sprites:** Canvas-based pixel art animation
 - **Package Manager:** Bun
 
 ## Getting Started
@@ -63,6 +64,43 @@ The first community challenge: a countdown timer game with dice rolling mechanic
 
 **Assets:** `public/day1/` — magikarp.png, shiny-magicarp.mp4, gyarados.mp4, comment.jpeg
 
+## Day 4 — Zoro Santoryu Splash Screen
+
+**Suggested by:** @nuruldarari
+**Reel:** [instagram.com/reel/DYCGW9Phni8](https://www.instagram.com/reel/DYCGW9Phni8/)
+
+Pixel art Roronoa Zoro (One Piece) greeting the viewer with a full cinematic splash screen before the site loads.
+
+**Flow:**
+1. **Loading phase (5s):** Zoro runs in place with loading music (`zoroloading.mp3`) and progress bar
+2. **Santoryu phase (~2.7s):** Santoryu image (`zorosantoryu.png`) appears with `zorosantoryu.mp3` music
+3. **Slash phase (3×0.58s):** Zoro slashes the screen 3 times to the rhythm of `slashsound.mp3`, growing bigger with blue glow
+4. **Shatter phase:** White screen fragments fall away revealing the dark site underneath
+
+**Features:**
+- Canvas-based pixel sprite animator with configurable sprite sheet, FPS, and scale
+- Two sprite sheets: running (6 frames) and sword attack (6 frames)
+- Audio fade-out transitions between phases
+- Screen shake, slash lines, sparks, and fragment explosion effects
+- Framer Motion for all animations
+
+**Sprite specs:**
+| Sprite | Grid | Frames | Frame Size | Sheet Size |
+|--------|------|--------|------------|------------|
+| `zoro_run.png` | 3×2 | 6 | 445×363 | 1336×726 |
+| `zoro.png` | 3×2 | 6 | 290×349 | 869×697 |
+
+**Audio assets:**
+| File | Duration | Usage |
+|------|----------|-------|
+| `zoroloading.mp3` | loop | Loading background music |
+| `zorosantoryu.mp3` | 2.74s | Santoryu reveal music |
+| `slashsound.mp3` | 0.58s | Sword slash SFX (×3) |
+
+**Components:**
+- `src/components/ZoroPixelLoader.tsx` — Canvas sprite animator
+- `src/components/SwordSplash.tsx` — Full splash screen orchestrator
+
 ## Links
 
 - Website: [abduarrahman.com](https://abduarrahman.com)
@@ -72,4 +110,4 @@ The first community challenge: a countdown timer game with dice rolling mechanic
 
 ---
 
-*Day 1 built. Comment your next idea.*
+*Day 4 built. Comment your next idea.*

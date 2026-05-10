@@ -610,7 +610,7 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
       >
-        DAY 3 — 30 DAYS WEB CHALLENGE
+        DAY 4 — 30 DAYS WEB CHALLENGE
       </motion.div>
 
       {/* Donut click popup */}
@@ -643,8 +643,8 @@ export default function MagikarpLanding({ onStart }: { onStart: () => void }) {
                 You found the secret donut!
               </h3>
               <p className="text-sm mb-4" style={{ color: "#9AA4B2" }}>
-                Day 2 Challenge — A spinning ASCII donut born from pure math.
-                No canvas. No WebGL. Just trigonometry, a z-buffer, and 12 characters of luminance.
+                Day 4 Challenge — Pixel art Zoro slashes the screen with Santoryu.
+                Running sprite, cinematic music, and 3 sword slashes that shatter the page.
                 The year was 2006. The donut was eternal. 🍩
               </p>
               <div className="flex gap-3 justify-center">

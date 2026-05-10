@@ -93,7 +93,7 @@ export default function SideMenu() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {comments.map((comment, i) => (
+                    {[...comments].reverse().map((comment, i) => (
                       <CommentCard
                         key={comment.id}
                         comment={comment}
@@ -107,7 +107,7 @@ export default function SideMenu() {
               {/* Footer */}
               <div className="border-t px-6 py-4" style={{ borderColor: "rgba(0,175,255,0.08)" }}>
                 <p className="text-center text-xs" style={{ color: "#9AA4B2" }}>
-                  Day 2 · Donut Math Edition
+                  Day 4 · Zoro Santoryu Edition
                 </p>
               </div>
             </motion.aside>

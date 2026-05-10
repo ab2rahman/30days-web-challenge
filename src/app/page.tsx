@@ -4,6 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import MagikarpLanding from "@/components/MagikarpLanding";
+import SwordSplash from "@/components/SwordSplash";
 
 const Day1Challenge = dynamic(() => import("@/components/Day1Challenge"), {
   loading: () => (
@@ -14,19 +15,23 @@ const Day1Challenge = dynamic(() => import("@/components/Day1Challenge"), {
 });
 
 export default function Home() {
+  const [splashDone, setSplashDone] = useState(false);
   const [started, setStarted] = useState(false);
 
   return (
-    <AnimatePresence mode="wait">
-      {!started ? (
-        <motion.div key="landing" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-          <MagikarpLanding onStart={() => setStarted(true)} />
-        </motion.div>
-      ) : (
-        <motion.div key="challenge" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          <Day1Challenge onHome={() => setStarted(false)} />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <>
+      {!splashDone && <SwordSplash onComplete={() => setSplashDone(true)} />}
+      <AnimatePresence mode="wait">
+        {!started ? (
+          <motion.div key="landing" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            <MagikarpLanding onStart={() => setStarted(true)} />
+          </motion.div>
+        ) : (
+          <motion.div key="challenge" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            <Day1Challenge onHome={() => setStarted(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

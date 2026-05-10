@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SideMenu from "@/components/SideMenu";
+import GanBloop from "@/components/GanBloop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,13 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "30 Days Web Challenge — Day 2: ASCII Donut Math",
+  title: "30 Days Web Challenge — Day 4: Zoro Santoryu Splash",
   description:
-    "Community-built website. 30 days. 30 features. Strangers decide what gets built. Day 2: A spinning ASCII donut replaces the title, with glitch effects and explosions.",
+    "Community-built website. 30 days. 30 features. Strangers decide what gets built. Day 4: Pixel art Zoro from One Piece greets you with a cinematic splash screen — running, santoryu reveal, and 3 sword slashes that shatter the screen.",
   openGraph: {
-    title: "30 Days Web Challenge — Day 2: ASCII Donut Math",
+    title: "30 Days Web Challenge — Day 4: Zoro Santoryu Splash",
     description:
-      "Community-built website. 30 days. 30 features. Strangers decide what gets built. Day 2: A spinning ASCII donut replaces the title, with glitch effects and explosions.",
+      "Community-built website. 30 days. 30 features. Strangers decide what gets built. Day 4: Pixel art Zoro from One Piece greets you with a cinematic splash screen — running, santoryu reveal, and 3 sword slashes that shatter the screen.",
     url: "https://abduarrahman.com/30days-web-challenge",
     siteName: "30 Days Web Challenge",
     type: "website",
@@ -39,6 +40,7 @@ export default function RootLayout({
     >
       <body className="h-full" style={{ background: "#050B18", color: "#F5F7FA" }}>
         <SideMenu />
+        <GanBloop />
         {children}
       </body>
     </html>

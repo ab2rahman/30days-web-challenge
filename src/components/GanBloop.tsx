@@ -329,7 +329,7 @@ export default function GanBloop() {
     return () => clearInterval(id);
   }, [winner]);
 
-  const posStyle = pos.x === -1 ? { bottom: 16, left: 16 } : { left: pos.x, top: pos.y };
+  const posStyle = pos.x === -1 ? { top: 68, left: 16 } : { left: pos.x, top: pos.y };
   const teamLabel = (t: number) => t === 0 ? "GRANMAJA" : "BLOOP";
 
   return (
