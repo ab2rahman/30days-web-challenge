@@ -13,6 +13,7 @@ const SLASH_SOUND_DUR = 576; // ms — one slash sound duration
 const NUM_SLASHES = 3;
 const SLASH_INTERVAL = SLASH_SOUND_DUR; // play next slash right after previous ends
 const TOTAL_SLASH_TIME = NUM_SLASHES * SLASH_INTERVAL; // ~1728ms for 3 slashes
+const SANTORYU_DUR = 2736; // ms — zorosantoryu.mp3 duration
 
 // ── 3 Slash lines — one per slash, different angles ──────────
 const SLASHES = [
@@ -39,21 +40,21 @@ const FRAGMENTS = [
 
 // ── Main Component ──────────
 export default function SwordSplash({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"loading" | "freeze" | "santoryu" | "slash" | "shatter" | "done">("loading");
+  const [phase, setPhase] = useState<"tap" | "loading" | "santoryu" | "slash" | "shatter" | "done">("tap");
   const [progress, setProgress] = useState(0);
   const [shake, setShake] = useState(false);
   const [showCuts, setShowCuts] = useState(false);
   const [fadeOutCuts, setFadeOutCuts] = useState(false);
   const loadingAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Start loading music on mount
-  useEffect(() => {
+  const startLoading = useCallback(() => {
+    setPhase("loading");
+
     const audio = new Audio(LOADING_MUSIC);
     audio.loop = true;
     audio.volume = 0.6;
     loadingAudioRef.current = audio;
     audio.play().catch(() => {});
-    return () => { audio.pause(); audio.currentTime = 0; };
   }, []);
 
   const triggerSantoryu = useCallback(() => {
@@ -78,8 +79,7 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
     santoryu.volume = 0.8;
     santoryu.play().catch(() => {});
 
-    // When santoryu ends → start slashing
-    santoryu.onended = () => {
+    const startSlash = () => {
       setPhase("slash");
       setShake(true);
       setShowCuts(true);
@@ -103,6 +103,17 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
         }, 800);
       }, TOTAL_SLASH_TIME + 200);
     };
+
+    // Use onended if audio plays, otherwise fallback to timer
+    let slashStarted = false;
+    const tryStart = () => {
+      if (slashStarted) return;
+      slashStarted = true;
+      startSlash();
+    };
+    santoryu.onended = tryStart;
+    // Fallback: if audio blocked, use hardcoded duration
+    setTimeout(tryStart, SANTORYU_DUR + 300);
   }, [onComplete]);
 
   useEffect(() => {
@@ -146,6 +157,30 @@ export default function SwordSplash({ onComplete }: { onComplete: () => void }) 
             100% { filter: drop-shadow(0 0 80px rgba(0,150,255,0.9)) drop-shadow(0 0 120px rgba(0,100,255,0.5)); }
           }
         `}</style>
+
+        {/* ── Tap to Start Phase ── */}
+        {phase === "tap" && (
+          <motion.div
+            className="flex flex-col items-center gap-8 cursor-pointer"
+            onClick={startLoading}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ZoroPixelLoader sprite="run" fps={14} scale={0.3} />
+            <div className="flex flex-col items-center gap-3">
+              <span className="text-2xl font-black tracking-tight text-gray-900">30 DAYS</span>
+              <span className="text-xs font-medium tracking-[0.3em] text-gray-400">WEB CHALLENGE</span>
+            </div>
+            <motion.div
+              className="flex flex-col items-center gap-2"
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <span className="text-sm font-semibold text-gray-500 tracking-wider">TAP TO START</span>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* ── Loading Phase ── */}
         {phase === "loading" && (
