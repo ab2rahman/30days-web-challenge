@@ -1,6 +1,6 @@
 # 30 Days Web Challenge
 
-**Live demo:** [abduarrahman.com/30days-web-challenge](https://abduarrahman.com/30days-web-challenge/)
+**Live demo:** [30days.abduarrahman.com](https://30days.abduarrahman.com/)
 
 Community-built website. 30 days. 30 features. Strangers decide what gets built. Open source.
 
@@ -39,8 +39,22 @@ bun run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
-bun run build   # Production static export
+bun run build   # Production static export → outputs to /out
 ```
+
+## Deployment
+
+Static export deployed via SSH + rsync to VPS:
+
+```bash
+npm run build
+rsync -avz --delete out/ abduarrahman-vps:/var/www/30days-abduarrahmancom/
+```
+
+**Server:** `abduarrahman-vps` (SSH alias → `root@202.155.91.233`)
+**Web root:** `/var/www/30days-abduarrahmancom/`
+**Domain:** `30days.abduarrahman.com` (nginx, SSL via Certbot)
+**Nginx config:** `/etc/nginx/sites-enabled/30days.abduarrahman.com`
 
 ## Day 1 — Magikarp Countdown Challenge
 
