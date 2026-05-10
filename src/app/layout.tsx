@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SideMenu from "@/components/SideMenu";
-import GanBloop from "@/components/GanBloop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,7 +39,6 @@ export default function RootLayout({
     >
       <body className="h-full" style={{ background: "#050B18", color: "#F5F7FA" }}>
         <SideMenu />
-        <GanBloop />
         {children}
       </body>
     </html>
